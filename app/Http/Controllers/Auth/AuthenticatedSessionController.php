@@ -21,14 +21,13 @@ class AuthenticatedSessionController extends Controller
 
     /**
      * Handle an incoming authentication request.
+     * Note: This is no longer used for customer login (they use Google OAuth).
+     * This method is kept for backward compatibility but should not be called.
      */
     public function store(LoginRequest $request): RedirectResponse
     {
-        $request->authenticate();
-
-        $request->session()->regenerate();
-
-        return redirect()->intended(route('dashboard', absolute: false));
+        // Customer should use Google login, redirect them
+        return redirect()->route('login')->with('error', 'Silakan gunakan login dengan Google untuk customer.');
     }
 
     /**

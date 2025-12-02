@@ -17,10 +17,23 @@ Route::middleware('guest')->group(function () {
 
     Route::post('register', [RegisteredUserController::class, 'store']);
 
+    // Customer Login (Google only)
     Route::get('login', [AuthenticatedSessionController::class, 'create'])
         ->name('login');
 
-    Route::post('login', [AuthenticatedSessionController::class, 'store']);
+    // Admin Login (Email/Password)
+    Route::get('admin/login', [\App\Http\Controllers\Auth\AdminLoginController::class, 'create'])
+        ->name('admin.login');
+
+    Route::post('admin/login', [\App\Http\Controllers\Auth\AdminLoginController::class, 'store'])
+        ->name('admin.login.store');
+
+    // Google OAuth Routes (for customers)
+    Route::get('auth/google', [\App\Http\Controllers\Auth\GoogleAuthController::class, 'redirect'])
+        ->name('google.login');
+
+    Route::get('auth/google/callback', [\App\Http\Controllers\Auth\GoogleAuthController::class, 'callback'])
+        ->name('google.callback');
 
     Route::get('forgot-password', [PasswordResetLinkController::class, 'create'])
         ->name('password.request');

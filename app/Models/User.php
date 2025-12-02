@@ -21,6 +21,9 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
+        'role',
+        'google_id',
+        'avatar',
     ];
 
     /**
@@ -44,5 +47,37 @@ class User extends Authenticatable
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
         ];
+    }
+
+    /**
+     * Check if user is customer
+     */
+    public function isCustomer(): bool
+    {
+        return $this->role === 'customer';
+    }
+
+    /**
+     * Check if user is admin
+     */
+    public function isAdmin(): bool
+    {
+        return $this->role === 'admin';
+    }
+
+    /**
+     * Check if user is super admin
+     */
+    public function isSuperAdmin(): bool
+    {
+        return $this->role === 'super_admin';
+    }
+
+    /**
+     * Check if user can access backend
+     */
+    public function canAccessBackend(): bool
+    {
+        return $this->isAdmin() || $this->isSuperAdmin();
     }
 }

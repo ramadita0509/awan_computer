@@ -29,6 +29,7 @@ class LoginRequest extends FormRequest
         return [
             'email' => ['required', 'string', 'email'],
             'password' => ['required', 'string'],
+            'role' => ['required', 'string', 'in:admin,super_admin'],
         ];
     }
 
@@ -41,11 +42,25 @@ class LoginRequest extends FormRequest
     {
         $this->ensureIsNotRateLimited();
 
-        if (! Auth::attempt($this->only('email', 'password'), $this->boolean('remember'))) {
+        $credentials = $this->only('email', 'password');
+        $role = $this->input('role');
+
+        if (! Auth::attempt($credentials, $this->boolean('remember'))) {
             RateLimiter::hit($this->throttleKey());
 
             throw ValidationException::withMessages([
                 'email' => trans('auth.failed'),
+            ]);
+        }
+
+        // Check if user role matches selected role
+        $user = Auth::user();
+        if ($user->role !== $role) {
+            Auth::logout();
+            RateLimiter::hit($this->throttleKey());
+
+            throw ValidationException::withMessages([
+                'role' => 'Role yang dipilih tidak sesuai dengan akun Anda.',
             ]);
         }
 
